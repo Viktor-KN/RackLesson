@@ -40,6 +40,4 @@ class TimeApp
   def validate(format)
     format.reject { |elem| TIME_FORMATS.key?(elem.to_sym) }.uniq
   end
-
-
 end
