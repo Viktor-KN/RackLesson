@@ -1,32 +1,20 @@
+require_relative 'date_time_format'
+
 class TimeApp
-  TIME_FORMATS = {
-    year: '%Y',
-    month: '%m',
-    day: '%d',
-    hour: '%H',
-    minute: '%M',
-    second: '%S'
-  }.freeze
-
   def self.call(env)
-    new.run(env)
-  end
-
-  def run(env)
     request = Rack::Request.new(env)
-    handle(request)
+    new.send :handle, request
   end
 
   private
 
   def handle(request)
-    format = request.params['format'].split(',')
-    unknown_format = validate(format)
-    return response_with_error("Unknown time format [#{unknown_format.join(', ')}]") unless unknown_format.empty?
+    format = request.params['format']&.split(',') || []
+    formatter = DateTimeFormat.new(format)
 
-    time = Time.now
-    response = format.map { |elem| time.strftime(TIME_FORMATS[elem.to_sym]) }.join('-')
-    response_with_ok(response)
+    return response_with_error(formatter.errors.join("\n")) unless formatter.valid?
+
+    response_with_ok(formatter.result)
   end
 
   def response_with_error(body)
@@ -35,9 +23,5 @@ class TimeApp
 
   def response_with_ok(body)
     Rack::Response.new(body, 200, 'Content-Type' => 'text/plain')
-  end
-
-  def validate(format)
-    format.reject { |elem| TIME_FORMATS.key?(elem.to_sym) }.uniq
   end
 end
