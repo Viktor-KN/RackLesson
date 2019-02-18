@@ -1,7 +1,7 @@
 require_relative 'time_app'
 
 routes = {
-  '/time' => TimeApp
+  '/time' => TimeApp.new
 }
 
 use Rack::Reloader
