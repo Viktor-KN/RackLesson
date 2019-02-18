@@ -1,9 +1,9 @@
 require_relative 'date_time_format'
 
 class TimeApp
-  def self.call(env)
+  def call(env)
     request = Rack::Request.new(env)
-    new.send :handle, request
+    handle(request)
   end
 
   private
@@ -12,13 +12,16 @@ class TimeApp
     format = request.params['format']&.split(',') || []
     formatter = DateTimeFormat.new(format)
 
-    return response_with_error(formatter.errors.join("\n")) unless formatter.valid?
-
-    response_with_ok(formatter.result)
+    if formatter.valid?
+      response_with_ok(formatter.result)
+    else
+      response_with_error(formatter.errors)
+    end
   end
 
-  def response_with_error(body)
-    Rack::Response.new(body, 400, 'Content-Type' => 'text/plain')
+  def response_with_error(errors)
+    text = "Unknown time format [#{errors.join(", ")}]"
+    Rack::Response.new(text, 400, 'Content-Type' => 'text/plain')
   end
 
   def response_with_ok(body)

@@ -12,7 +12,6 @@ class DateTimeFormat
 
   def initialize(format)
     @format = format
-    @errors = []
     validate!
   end
 
@@ -32,9 +31,6 @@ class DateTimeFormat
   attr_writer :errors
 
   def validate!
-    return errors << "Required 'format' parameter not defined" if format.nil? || format.empty?
-
-    invalid_tokens = format.reject { |elem| DATE_TIME_TOKENS.key?(elem.to_sym) }.uniq
-    errors << "Unknown time format [#{invalid_tokens.join(', ')}]" unless invalid_tokens.empty?
+    self.errors = format.reject { |elem| DATE_TIME_TOKENS.key?(elem.to_sym) }.uniq
   end
 end
