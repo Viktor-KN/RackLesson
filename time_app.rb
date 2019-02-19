@@ -9,7 +9,9 @@ class TimeApp
   private
 
   def handle(request)
-    format = request.params['format']&.split(',') || []
+    return response_with_error([]) if request.params['format'].nil?
+
+    format = request.params['format'].split(',')
     formatter = DateTimeFormat.new(format)
 
     if formatter.valid?
