@@ -20,10 +20,10 @@ class DateTimeFormat
   end
 
   def result
-    if valid?
-      time = Time.now
-      format.map { |elem| time.strftime(DATE_TIME_TOKENS[elem.to_sym]) }.join('-')
-    end
+    return unless valid?
+
+    time = Time.now
+    format.map { |elem| time.strftime(DATE_TIME_TOKENS[elem.to_sym]) }.join('-')
   end
 
   private
